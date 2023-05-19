@@ -16,41 +16,49 @@ import ru.kata.spring.boot_security.demo.servic.UserService;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public static BCryptPasswordEncoder BCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 
     private final SuccessUserHandler successUserHandler;
     private final UserDetailsService userDetailsrv;
 
+    private final BCryptPasswordEncoder bcrypt;
     @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService,/*, BCryptPasswordEncoder bcrypt*/UserDetailsService userDetailsrv) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserDetailsService userDetailsrv,
+                              BCryptPasswordEncoder bcrypt) {
         this.successUserHandler = successUserHandler;
         this.userDetailsrv = userDetailsrv;
-        //this.userService = userService;
+
+        this.bcrypt = bcrypt;
+
+
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/", "/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/", "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().successHandler(successUserHandler)
+                .formLogin()
+                .loginPage("/login")
+                .successHandler(successUserHandler)
                 .permitAll()
                 .and()
                 .logout()
                 .permitAll();
     }
 
+
     @Bean
     protected DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsrv);
-        daoAuthenticationProvider.setPasswordEncoder(BCryptPasswordEncoder());
+        daoAuthenticationProvider.setPasswordEncoder(bcrypt);
         return daoAuthenticationProvider;
     }
 }
