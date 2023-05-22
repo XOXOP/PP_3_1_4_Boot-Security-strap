@@ -8,8 +8,8 @@ import ru.kata.spring.boot_security.demo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class InitiateUtil  {
@@ -30,10 +30,10 @@ public class InitiateUtil  {
             Role role1 = new Role("ROLE_USER");
             roleService.save(role);
             roleService.save(role1);
-            List<Role> roleAdminUser = new ArrayList<>();
+            Set<Role> roleAdminUser = new HashSet<>();
             roleAdminUser.add(role);
             roleAdminUser.add(role1);
-            List<Role> roleUser = new ArrayList<>();
+            Set<Role> roleUser = new HashSet<>();
             roleUser.add(role1);
             User admin = new User("2du6ifs@hotmail.net","dummy-user","User-is-dummy" ,
                     "0001", 22,roleAdminUser);
